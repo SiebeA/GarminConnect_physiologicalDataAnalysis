@@ -1,20 +1,18 @@
 #https://pypi.org/project/garminconnect/
 #!/usr/bin/env python3
 
-import pandas as pd
+from pandas import DataFrame as df
  
 from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
-import datetime
 
 nrOfActivitiesIncluded = 100
 
+import datetime
 today = datetime.date.today()
-date_list = [today - datetime.timedelta(days=x) for x in range(10)]
-
+# date_list = [today - datetime.timedelta(days=x) for x in range(10)]
 #=======================#
 '   Initialize Garmin client with credentials Only needed when your program is initialized              '
 #========================= #
-
 try:
     client = Garmin('siebealbers@hotmail.com', 'Bobobalto45!')
 except ( GarminConnectConnectionError, GarminConnectAuthenticationError, GarminConnectTooManyRequestsError, )as err:
@@ -46,6 +44,12 @@ except Exception:  # pylint: disable=broad-except
 '''  downloading activity inf'''
 #======================================================================== #
     
+#all data for today:
+allData_forTheDay = client.get_stats_and_body(today.isoformat())
+allData_forTheDay = {k: v for k, v in allData_forTheDay.items() if v is not None}#only keep the keys for which I have data (i.e. remove non objects)
+
+stats = client.get_stats(today.isoformat())
+stats = {k: v for k, v in stats.items() if v is not None}
 
 #timestampsHRvalues = [datetime.datetime.fromtimestamp(I[0]/1000) for I in hrlistCleaned]
 
@@ -55,38 +59,23 @@ listv = list(activities[0].keys())
 for I in listv:
     if activities[0][I] != None:
         print( activities[0][I] ) 
-
-
-#all data for today:
-allData_forTheDay = client.get_stats_and_body(today.isoformat())
-#only keep the keys for which I have data (i.e. remove non objects)
-allData_forTheDay = {k: v for k, v in allData_forTheDay.items() if v is not None}
-
 #remove non objects for all the activities:
 Counter =0
 for I in activities:
     activities[Counter] = {k: v for k, v in I.items() if v is not None}
     Counter +=1
 
-'            Organizing (df)                '
-#========================= #
-
-df = pd.DataFrame()
-
-keys = 'averageHR startTimeLocal activityName calories duration elapsedDuration distance '.split()
-
-
+keys = 'averageHR startTimeLocal activityName calories duration elapsedDuration distance '.split() #from activities; will be used for columns in df
 activities_filtered = []
-# counter = 0
 for dic in activities: #activities = listOfDics each holding keysRepresentingGarminMetrics
     for key in keys:
         if key =='activityName':
             dic['activityName'] = dic['activityName'][20:] #remove the town of the activity
+            dic['startTimeLocal'] = dic['startTimeLocal'][5:-3] #remove the town of the
         dic = { key:val for key, val in dic.items() if key in keys } # my defined keys from all the keys
     activities_filtered.append(dic)
 
-activities_filtered_df = pd.DataFrame.from_dict(activities_filtered)
-
+activities_filtered_df = df.from_dict(activities_filtered)
 # change a columns values from seconds to minutes:
 activities_filtered_df['duration']  = activities_filtered_df['duration'] /60
 activities_filtered_df['elapsedDuration']  = activities_filtered_df['elapsedDuration'] /60
