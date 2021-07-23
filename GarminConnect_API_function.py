@@ -10,11 +10,9 @@ def clientt():
         print("Unknown error occured during Garmin Connect Client init")
         quit()
     return client
-
 client = clientt()
 
 def login():
-    # client = clientt()
     # client = clientt()
     import datetime
     today = datetime.date.today()
@@ -32,7 +30,9 @@ def login():
 
 
 def get_activities(nractsincluded):
-    #TODO print timestamp ; 
+    # client = login() PRObleMS IF LEFT HERE
+    
+    #TODO print timestamp ; \n after day , automatic summing of the day ; daysBack instead of nr of activities; endTime = startime+elapsed ; 
     nrOfActivitiesIncluded = nractsincluded
     activities = client.get_activities(0,nrOfActivitiesIncluded)
     #remove non objects for all the activities:
@@ -48,24 +48,20 @@ def get_activities(nractsincluded):
         for key in keys:
             if key =='activityName':
                 dic['activityName'] = dic['activityName'][20:] #remove the town of the activity
-                dic['startTimeLocal'] = dic['startTimeLocal'][5:-3] #remove the town of the activity
+                # dic['startTimeLocal'] = dic['startTimeLocal'][5:-3] #easy for ide, but messes up dateformat for csv
             dic = { key:val for key, val in dic.items() if key in keys } # my defined keys from all the keys
         activities_filtered.append(dic)
-    
     activities_filtered_df = df().from_dict(activities_filtered)
     # change a columns values from seconds to minutes:
     activities_filtered_df['duration']  = activities_filtered_df['duration'] /60
     activities_filtered_df['elapsedDuration']  = activities_filtered_df['elapsedDuration'] /60
     activities_filtered_df['distance']  = activities_filtered_df['distance'] /1000
     activities_filtered_df.to_csv('output.csv', index=False)
-    
-    return activities_filtered_df
+    return activities_filtered_df, activities
+
+
+activities_filtered_df, activities = get_activities(5)
 
 
 
-# client = clientt()
-# client, today = login()
 
-activities_filtered_df = get_activities(150)
-
-# from pandas import DataFrame as df

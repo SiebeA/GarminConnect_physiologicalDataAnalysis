@@ -5,10 +5,12 @@ from pandas import DataFrame as df
  
 from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
 
-nrOfActivitiesIncluded = 100
+nrOfActivitiesIncluded = 5
 
 import datetime
 today = datetime.date.today()
+
+
 # date_list = [today - datetime.timedelta(days=x) for x in range(10)]
 #=======================#
 '   Initialize Garmin client with credentials Only needed when your program is initialized              '
@@ -51,6 +53,9 @@ allData_forTheDay = {k: v for k, v in allData_forTheDay.items() if v is not None
 stats = client.get_stats(today.isoformat())
 stats = {k: v for k, v in stats.items() if v is not None}
 
+act_details = client.get_activity_details(7162578374)
+heartrates = client.get_heart_rates(str(today))
+url = client.url_activities
 #timestampsHRvalues = [datetime.datetime.fromtimestamp(I[0]/1000) for I in hrlistCleaned]
 
 #activities
