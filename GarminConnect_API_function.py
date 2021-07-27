@@ -1,17 +1,20 @@
 
 def clientt():
+    import sys
     from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
     try:
-        client = Garmin('email', 'password')
+        client = Garmin('yourGarminEmail', 'YourGarminPass')
     except ( GarminConnectConnectionError, GarminConnectAuthenticationError, GarminConnectTooManyRequestsError, )as err:
         print("Error occured during Garmin Connect Client init: %s" % err)
-        quit()
+        sys.exit
     except Exception:  # pylint: disable=broad-except
         print("Unknown error occured during Garmin Connect Client init")
-        quit()
+        sys.exit
     return client
 
 def login():
+    from functions_python import clientt
+    import sys
     client = clientt()
     import datetime
     today = datetime.date.today()
@@ -21,14 +24,18 @@ def login():
     except ( GarminConnectConnectionError, GarminConnectAuthenticationError, 
     GarminConnectTooManyRequestsError, ) as err:
         print("Error occured during Garmin Connect Client login: %s" % err)
-        quit()
+        sys.exit
     except Exception:  # pylint: disable=broad-except
         print("Unknown error occured during Garmin Connect Client login")
-        quit()
+        sys.exit
     return client, today
 
 
 def get_activities(nractsincluded):
+    """Input argument: the numbers of activities that you want to have returned.
+    returns 2 datatypes: a df of filtered activities, and a list of all the activities that can be scraped from the garminConnect platform; in addition, it saves a CSV file of the created DF in the Cwdir)"""
+    from functions_Python import clientt, login
+    client, today = login()
     # client = login() PRObleMS IF LEFT HERE
     
     #TODO print timestamp ; \n after day , automatic summing of the day ; daysBack instead of nr of activities; endTime = startime+elapsed ; 
@@ -57,7 +64,6 @@ def get_activities(nractsincluded):
     activities_filtered_df['distance']  = activities_filtered_df['distance'] /1000
     activities_filtered_df.to_csv('output.csv', index=False)
     return activities_filtered_df, activities
-
 
 activities_filtered_df, activities = get_activities(5)
 
