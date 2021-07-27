@@ -16,7 +16,7 @@ today = datetime.date.today()
 '   Initialize Garmin client with credentials Only needed when your program is initialized              '
 #========================= #
 try:
-    client = Garmin('siebealbers@hotmail.com', 'Bobobalto45!')
+    client = Garmin('email', 'password!')
 except ( GarminConnectConnectionError, GarminConnectAuthenticationError, GarminConnectTooManyRequestsError, )as err:
     print("Error occured during Garmin Connect Client init: %s" % err)
     quit()
