@@ -2,7 +2,7 @@
 def clientt():
     from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
     try:
-        client = Garmin('siebealbers@hotmail.com', 'Bobobalto45!')
+        client = Garmin('email', 'password')
     except ( GarminConnectConnectionError, GarminConnectAuthenticationError, GarminConnectTooManyRequestsError, )as err:
         print("Error occured during Garmin Connect Client init: %s" % err)
         quit()
