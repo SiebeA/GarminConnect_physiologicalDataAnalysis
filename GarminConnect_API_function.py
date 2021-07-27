@@ -10,10 +10,9 @@ def clientt():
         print("Unknown error occured during Garmin Connect Client init")
         quit()
     return client
-client = clientt()
 
 def login():
-    # client = clientt()
+    client = clientt()
     import datetime
     today = datetime.date.today()
     from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
