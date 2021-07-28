@@ -30,7 +30,6 @@ def login():
         sys.exit
     return client, today
 
-
 def get_activities(nractsincluded):
     """Input argument: the numbers of activities that you want to have returned.
     returns 2 datatypes: a df of filtered activities, and a list of all the activities that can be scraped from the garminConnect platform; in addition, it saves a CSV file of the created DF in the Cwdir)"""
