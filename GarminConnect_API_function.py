@@ -3,7 +3,7 @@ def clientt():
     import sys
     from garminconnect import ( Garmin,GarminConnectConnectionError,GarminConnectTooManyRequestsError, GarminConnectAuthenticationError,)
     try:
-        client = Garmin('yourGarminEmail', 'YourGarminPass')
+        client = Garmin('yourGarminEmail', 'YourGarminPassword')
     except ( GarminConnectConnectionError, GarminConnectAuthenticationError, GarminConnectTooManyRequestsError, )as err:
         print("Error occured during Garmin Connect Client init: %s" % err)
         sys.exit
@@ -13,7 +13,7 @@ def clientt():
     return client
 
 def login():
-    from functions_python import clientt
+    from functions import clientt
     import sys
     client = clientt()
     import datetime
@@ -33,7 +33,7 @@ def login():
 def get_activities(nractsincluded):
     """Input argument: the numbers of activities that you want to have returned.
     returns 2 datatypes: a df of filtered activities, and a list of all the activities that can be scraped from the garminConnect platform; in addition, it saves a CSV file of the created DF in the Cwdir)"""
-    from functions_Python import clientt, login
+    from functions import clientt, login
     client, today = login()
     # client = login() PRObleMS IF LEFT HERE
     
@@ -62,10 +62,12 @@ def get_activities(nractsincluded):
     activities_filtered_df['elapsedDuration']  = activities_filtered_df['elapsedDuration'] /60
     activities_filtered_df['distance']  = activities_filtered_df['distance'] /1000
     activities_filtered_df.to_csv('output.csv', index=False)
-    return activities_filtered_df, activities
+    # return activities_filtered_df, activities
 
 activities_filtered_df, activities = get_activities(5)
 
+#TODO ; beyond 'mill en sint hubert' gives bad activityname
+# perhaps make one row with the location (fun when in foreign country)
 
 
 
