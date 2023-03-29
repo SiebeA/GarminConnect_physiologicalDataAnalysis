@@ -35,7 +35,7 @@ api = None
 
 # Example selections and settings
 today = datetime.date.today()
-startdate = today - datetime.timedelta(days=7) # Select past week
+startdate = today - datetime.timedelta(days=10) # Select past week
 start = 0
 limit = 100
 start_badge = 1  # Badge related calls calls start counting at 1
@@ -85,6 +85,22 @@ menu_options = {
     "Z": "Logout Garmin Connect portal",
     "q": "Exit",
 }
+
+def format_date(date_str):
+    """Format date string in YYYY-MM-DD format"""
+    date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+    return date_obj.strftime('%Y-%m-%d')
+
+def write_data_to_file(data):
+    """Write data to a file in the desired format"""
+    with open('step_data.txt', 'w') as f:
+        f.write('Date\ttotalSteps\n')
+        for item in data[0]:
+            date_str = format_date(item['calendarDate'])
+            total_steps = item['totalSteps']
+            f.write(f'{date_str}\t{total_steps}\n')
+    print('Data written to file: step_data.txt')
+
 
 def display_json(api_call, output):
     """Format API output for better readability."""
@@ -225,7 +241,9 @@ def switch(api, i):
                 display_json(f"api.get_body_battery('{startdate.isoformat()}, {today.isoformat()}')", api.get_body_battery(startdate.isoformat(), today.isoformat()))
             elif i == "-":
                 # Get daily step data for 'YYYY-MM-DD'
-                display_json(f"api.get_daily_steps('{startdate.isoformat()}, {today.isoformat()}')", api.get_daily_steps(startdate.isoformat(), today.isoformat()))
+                steps = display_json(f"api.get_daily_steps('{startdate.isoformat()}, {today.isoformat()}')", api.get_daily_steps(startdate.isoformat(), today.isoformat()))
+                steps = api.get_daily_steps(startdate.isoformat(), today.isoformat())
+                write_data_to_file(steps)
             elif i == ".":
                 # Get training status data for 'YYYY-MM-DD'
                 display_json(f"api.get_training_status('{today.isoformat()}')", api.get_training_status(today.isoformat()))
