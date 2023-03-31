@@ -43,49 +43,50 @@ activitytype = ""  # Possible values are: cycling, running, swimming, multi_spor
 activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 
 menu_options = {
-    "1": "Get full name",
-    "2": "Get unit system",
-    "3": f"Get activity data for '{today.isoformat()}'",
-    "4": f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-    "5": f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
-    "6": f"Get body composition data for from '{startdate.isoformat()}' to '{today.isoformat()}' (to be compatible with garminconnect-ha)",
-    "7": f"Get stats and body composition data for '{today.isoformat()}'",
-    "8": f"Get steps data for '{today.isoformat()}'",
-    "9": f"Get heart rate data for '{today.isoformat()}'",
-    "0": f"Get training readiness data for '{today.isoformat()}'",
     "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
-    "/": f"Get body battery data for '{startdate.isoformat()}' to '{today.isoformat()}'",
-    ".": f"Get training status data for '{today.isoformat()}'",
-    "a": f"Get resting heart rate data for {today.isoformat()}'",
-    "b": f"Get hydration data for '{today.isoformat()}'",
-    "c": f"Get sleep data for '{today.isoformat()}'",
-    "d": f"Get stress data for '{today.isoformat()}'",
-    "e": f"Get respiration data for '{today.isoformat()}'",
-    "f": f"Get SpO2 data for '{today.isoformat()}'",
-    "g": f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
-    "h": "Get personal record for user",
-    "i": "Get earned badges for user",
-    "j": f"Get adhoc challenges data from start '{start}' and limit '{limit}'",
-    "k": f"Get available badge challenges data from '{start_badge}' and limit '{limit}'",
-    "l": f"Get badge challenges data from '{start_badge}' and limit '{limit}'",
-    "m": f"Get non completed badge challenges data from '{start_badge}' and limit '{limit}'",
-    "n": f"Get activities data from start '{start}' and limit '{limit}'",
-    "o": "Get last activity",
-    "p": f"Download activities data by date from '{startdate.isoformat()}' to '{today.isoformat()}'",
-    "r": f"Get all kinds of activities data from '{start}'",
-    "s": f"Upload activity data from file '{activityfile}'",
-    "t": "Get all kinds of Garmin device info",
-    "u": "Get active goals",
-    "v": "Get future goals",
-    "w": "Get past goals",
-    "y": "Get all Garmin device alarms",
-    "x": f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
-    "z": f"Get progress summary from '{startdate.isoformat()}' to '{today.isoformat()}' for all metrics",
-    "A": "Get gear, the defaults, activity types and statistics",
-    "Z": "Logout Garmin Connect portal",
+    # "1": "Get full name",
+    # "2": "Get unit system",
+    # "3": f"Get activity data for '{today.isoformat()}'",
+    # "4": f"Get activity data for '{today.isoformat()}' (compatible with garminconnect-ha)",
+    # "5": f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
+    # "6": f"Get body composition data for from '{startdate.isoformat()}' to '{today.isoformat()}' (to be compatible with garminconnect-ha)",
+    # "7": f"Get stats and body composition data for '{today.isoformat()}'",
+    # "8": f"Get steps data for '{today.isoformat()}'",
+    # "9": f"Get heart rate data for '{today.isoformat()}'",
+    # "0": f"Get training readiness data for '{today.isoformat()}'",
+    # "/": f"Get body battery data for '{startdate.isoformat()}' to '{today.isoformat()}'",
+    # ".": f"Get training status data for '{today.isoformat()}'",
+    # "a": f"Get resting heart rate data for {today.isoformat()}'",
+    # "b": f"Get hydration data for '{today.isoformat()}'",
+    # "c": f"Get sleep data for '{today.isoformat()}'",
+    # "d": f"Get stress data for '{today.isoformat()}'",
+    # "e": f"Get respiration data for '{today.isoformat()}'",
+    # "f": f"Get SpO2 data for '{today.isoformat()}'",
+    # "g": f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
+    # "h": "Get personal record for user",
+    # "i": "Get earned badges for user",
+    # "j": f"Get adhoc challenges data from start '{start}' and limit '{limit}'",
+    # "k": f"Get available badge challenges data from '{start_badge}' and limit '{limit}'",
+    # "l": f"Get badge challenges data from '{start_badge}' and limit '{limit}'",
+    # "m": f"Get non completed badge challenges data from '{start_badge}' and limit '{limit}'",
+    # "n": f"Get activities data from start '{start}' and limit '{limit}'",
+    # "o": "Get last activity",
+    # "p": f"Download activities data by date from '{startdate.isoformat()}' to '{today.isoformat()}'",
+    # "r": f"Get all kinds of activities data from '{start}'",
+    # "s": f"Upload activity data from file '{activityfile}'",
+    # "t": "Get all kinds of Garmin device info",
+    # "u": "Get active goals",
+    # "v": "Get future goals",
+    # "w": "Get past goals",
+    # "y": "Get all Garmin device alarms",
+    # "x": f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
+    # "z": f"Get progress summary from '{startdate.isoformat()}' to '{today.isoformat()}' for all metrics",
+    # "A": "Get gear, the defaults, activity types and statistics",
+    # "Z": "Logout Garmin Connect portal",
     "q": "Exit",
 }
 
+# created by Siebe:
 def format_date(date_str):
     """Format date string in YYYY-MM-DD format"""
     date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
@@ -101,7 +102,7 @@ def write_data_to_file(data):
             f.write(f'{date_str}\t{total_steps}\n')
     print('Data written to file: step_data.txt')
 
-
+# Original:
 def display_json(api_call, output):
     """Format API output for better readability."""
 
