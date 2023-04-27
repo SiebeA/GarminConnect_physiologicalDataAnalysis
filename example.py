@@ -24,7 +24,13 @@ from garminconnect import (
 )
 
 import datetime
+import pytz
 import pandas as pd
+
+# time format
+timezone = pytz.timezone("Europe/Athens")
+# print the current time:
+datetime.datetime.now(timezone).strftime("%Y-%m-%d %H:%M") # the '%' is used to format the date and time, examples:
 
 date_str = '2023-04-27T13:30:00.0'
 date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f')
@@ -97,10 +103,10 @@ menu_options = {
 #   # created by Siebe:                                      #
 # ============================================
 
-def format_date(date_str):
-    """Format date string in YYYY-MM-DD format"""
-    date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-    return date_obj.strftime('%Y-%m-%d')
+# def format_date(date_str):
+#     """Format date string in YYYY-MM-DD format"""
+#     date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+#     return date_obj.strftime('%Y-%m-%d')
 
 def write_data_to_file(data):
     """Write data to a file in the desired format"""
@@ -129,19 +135,29 @@ def display_json(i, api_call, output):
     print(footer)
 
     if i == "8": # i.e. if the user wants to get the steps data for every 15 minute interval for today
-            # convert the startGMT and end GMT to a readable format
+        # convert the startGMT and end GMT to a readable format
         for item in output:
-            start_time = datetime.datetime.strptime(item["startGMT"], '%Y-%m-%dT%H:%M:%S.%f')
-            # replace the old time format with the new one
+            # parse the start time
+            start_time = datetime.datetime.fromisoformat(item["startGMT"])
+            # convert the start time to the user's timezone
+            start_time = pytz.utc.localize(start_time).astimezone(timezone)
+            # format the start time without the GMT offset
             item["startGMT"] = start_time.strftime('%m-%d %H:%M')
-            start_time = datetime.datetime.strptime(item["endGMT"], '%Y-%m-%dT%H:%M:%S.%f')
-            item["endGMT"] = start_time.strftime('%m-%d %H:%M')
-            formatted_time = start_time.strftime('%m-%d %H:%M')
+
+            # parse the end time
+            end_time = datetime.datetime.fromisoformat(item["endGMT"])
+            # convert the end time to the user's timezone
+            end_time = pytz.utc.localize(end_time).astimezone(timezone)
+            # format the end time without the GMT offset
+            item["endGMT"] = end_time.strftime('%m-%d %H:%M')
 
         # convert output which is a list of dictionaries to a dataframe
         df = pd.DataFrame(output)
+        # print the last 3 rows of the dataframe:
+        print(df.tail(3))
         # convert it to a excel file
         df.to_excel('step_data.xlsx', index=False)
+        print("Data written to file: step_data.xlsx")
         # convert output which is a list of dictionaries to a csv file
 
 
