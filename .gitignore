@@ -1,3 +1,8 @@
+
+*.txt
+*.csv
+*.xlsx
+
 session.json
 # Byte-compiled / optimized / DLL files
 __pycache__/

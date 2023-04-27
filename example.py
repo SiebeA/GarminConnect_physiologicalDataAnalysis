@@ -23,6 +23,13 @@ from garminconnect import (
     GarminConnectTooManyRequestsError,
 )
 
+import datetime
+import pandas as pd
+
+date_str = '2023-04-27T13:30:00.0'
+date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f')
+
+
 # Configure debug logging
 # logging.basicConfig(level=logging.DEBUG)
 logging.basicConfig(level=logging.INFO)
@@ -110,7 +117,7 @@ def write_data_to_file(data):
 # :# ============================================
 #    Original                                     #
 # ============================================
-def display_json(api_call, output, i):
+def display_json(i, api_call, output):
     """Format API output for better readability."""
 
     dashed = "-"*20
@@ -121,9 +128,23 @@ def display_json(api_call, output, i):
     print(json.dumps(output, indent=4))
     print(footer)
 
-    if i == 8:
-        # Write data to file
-        return output
+    if i == "8": # i.e. if the user wants to get the steps data for every 15 minute interval for today
+            # convert the startGMT and end GMT to a readable format
+        for item in output:
+            start_time = datetime.datetime.strptime(item["startGMT"], '%Y-%m-%dT%H:%M:%S.%f')
+            # replace the old time format with the new one
+            item["startGMT"] = start_time.strftime('%m-%d %H:%M')
+            start_time = datetime.datetime.strptime(item["endGMT"], '%Y-%m-%dT%H:%M:%S.%f')
+            item["endGMT"] = start_time.strftime('%m-%d %H:%M')
+            formatted_time = start_time.strftime('%m-%d %H:%M')
+
+        # convert output which is a list of dictionaries to a dataframe
+        df = pd.DataFrame(output)
+        # convert it to a excel file
+        df.to_excel('step_data.xlsx', index=False)
+        # convert output which is a list of dictionaries to a csv file
+
+
 
 def display_text(output):
     """Format API output for better readability."""
@@ -221,10 +242,9 @@ def switch(api, i):
 # ============================================
             elif i == "8":
                 # Get steps data for 'YYYY-MM-DD'
-                display_json(f"api.get_steps_data('{today.isoformat()}')", api.get_steps_data(today.isoformat()))
+                display_json(i, f"api.get_steps_data('{today.isoformat()}')", api.get_steps_data(today.isoformat()))
                 # Write data to file
                 # write_data_to_file(api.get_steps_data(today.isoformat()))
-                
 
 # ============================================
 #                                         #
@@ -492,8 +512,6 @@ def switch(api, i):
             pass
     else:
         print("Could not login to Garmin Connect, try again later.")
-
-    return i
 
 # Main program loop
 while True:
