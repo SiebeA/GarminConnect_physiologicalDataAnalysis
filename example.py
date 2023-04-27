@@ -44,6 +44,8 @@ activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 
 menu_options = {
     "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
+    "8": f"Get steps data for '{today.isoformat()}'",
+    # "h": "Get personal record for user",
     # "1": "Get full name",
     # "2": "Get unit system",
     # "3": f"Get activity data for '{today.isoformat()}'",
@@ -51,7 +53,6 @@ menu_options = {
     # "5": f"Get body composition data for '{today.isoformat()}' (compatible with garminconnect-ha)",
     # "6": f"Get body composition data for from '{startdate.isoformat()}' to '{today.isoformat()}' (to be compatible with garminconnect-ha)",
     # "7": f"Get stats and body composition data for '{today.isoformat()}'",
-    # "8": f"Get steps data for '{today.isoformat()}'",
     # "9": f"Get heart rate data for '{today.isoformat()}'",
     # "0": f"Get training readiness data for '{today.isoformat()}'",
     # "/": f"Get body battery data for '{startdate.isoformat()}' to '{today.isoformat()}'",
@@ -63,7 +64,6 @@ menu_options = {
     # "e": f"Get respiration data for '{today.isoformat()}'",
     # "f": f"Get SpO2 data for '{today.isoformat()}'",
     # "g": f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
-    # "h": "Get personal record for user",
     # "i": "Get earned badges for user",
     # "j": f"Get adhoc challenges data from start '{start}' and limit '{limit}'",
     # "k": f"Get available badge challenges data from '{start_badge}' and limit '{limit}'",
@@ -86,7 +86,10 @@ menu_options = {
     "q": "Exit",
 }
 
-# created by Siebe:
+# ============================================
+#   # created by Siebe:                                      #
+# ============================================
+
 def format_date(date_str):
     """Format date string in YYYY-MM-DD format"""
     date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
@@ -96,14 +99,18 @@ def write_data_to_file(data):
     """Write data to a file in the desired format"""
     with open('step_data.txt', 'w') as f:
         f.write('Date\ttotalSteps\n')
-        for item in data[0]:
+        # reverse the list so that the oldest date is first
+        data.reverse()
+        for item in data:
             date_str = format_date(item['calendarDate'])
             total_steps = item['totalSteps']
             f.write(f'{date_str}\t{total_steps}\n')
     print('Data written to file: step_data.txt')
 
-# Original:
-def display_json(api_call, output):
+# :# ============================================
+#    Original                                     #
+# ============================================
+def display_json(api_call, output, i):
     """Format API output for better readability."""
 
     dashed = "-"*20
@@ -113,6 +120,10 @@ def display_json(api_call, output):
     print(header)
     print(json.dumps(output, indent=4))
     print(footer)
+
+    if i == 8:
+        # Write data to file
+        return output
 
 def display_text(output):
     """Format API output for better readability."""
@@ -128,7 +139,7 @@ def display_text(output):
 def get_credentials():
     """Get user credentials."""
     email = input("Login e-mail: ")
-    password = pwinput.pwinput(prompt='Password: ')
+    password = pwinput.pwinput(prompt='Password: ') # pwinput is a library that hides the password input
 
     return email, password
 
@@ -204,6 +215,20 @@ def switch(api, i):
             if i == "1":
                 # Get full name from profile
                 display_json("api.get_full_name()", api.get_full_name())
+
+# ============================================
+#                                         #
+# ============================================
+            elif i == "8":
+                # Get steps data for 'YYYY-MM-DD'
+                display_json(f"api.get_steps_data('{today.isoformat()}')", api.get_steps_data(today.isoformat()))
+                # Write data to file
+                # write_data_to_file(api.get_steps_data(today.isoformat()))
+                
+
+# ============================================
+#                                         #
+# ============================================
             elif i == "2":
                 # Get unit system from profile
                 display_json("api.get_unit_system()", api.get_unit_system())
@@ -228,9 +253,6 @@ def switch(api, i):
                 display_json(f"api.get_stats_and_body('{today.isoformat()}')", api.get_stats_and_body(today.isoformat()))
 
             # USER STATISTICS LOGGED
-            elif i == "8":
-                # Get steps data for 'YYYY-MM-DD'
-                display_json(f"api.get_steps_data('{today.isoformat()}')", api.get_steps_data(today.isoformat()))
             elif i == "9":
                 # Get heart rate data for 'YYYY-MM-DD'
                 display_json(f"api.get_heart_rates('{today.isoformat()}')", api.get_heart_rates(today.isoformat()))
@@ -352,6 +374,7 @@ def switch(api, i):
                         fb.write(csv_data)
                     print(f"Activity data downloaded to file {output_file}")
 
+
             elif i == "r":
                 # Get activities data from start and limit
                 activities = api.get_activities(start, limit)  # 0=start, 1=limit
@@ -469,6 +492,8 @@ def switch(api, i):
             pass
     else:
         print("Could not login to Garmin Connect, try again later.")
+
+    return i
 
 # Main program loop
 while True:
