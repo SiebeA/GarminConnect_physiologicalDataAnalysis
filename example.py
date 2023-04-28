@@ -1,3 +1,7 @@
+# TODO:
+# - only show one line of the day date; thereafter only the time
+
+
 #!/usr/bin/env python3
 """
 pip3 install cloudscraper requests readchar pwinput
