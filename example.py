@@ -335,7 +335,13 @@ def switch(api, i):
                 display_json(f"api.get_activities({start}, {limit})", api.get_activities(start, limit)) # 0=start, 1=limit
             elif i == "o":
                 # Get last activity
-                display_json("api.get_last_activity()", api.get_last_activity())
+                output = api.get_last_activity()
+                output = {k: v for k, v in output.items() if v is not None}
+                display_json("api.get_last_activity()", output)
+                print("# only returned the dictionary keys whose value is not null, or None \n\n")
+
+                # print the following keys from the dictionary: duration; elevationGain; calories; steps:
+                print(f"Duration: {round(output['duration']/60)} minutes \n Elevation Gain: {output['elevationGain']}\nCalories: {output['calories']}\nSteps: {output['steps']:,} \n\n")
             elif i == "p":
                 # Get activities data from startdate 'YYYY-MM-DD' to enddate 'YYYY-MM-DD', with (optional) activitytype
                 # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
