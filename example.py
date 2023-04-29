@@ -28,6 +28,7 @@ from garminconnect import (
 )
 
 import datetime
+import openpyxl
 import pytz
 import pandas as pd
 
@@ -127,7 +128,7 @@ def write_data_to_file(data):
 # :# ============================================
 #    Original                                     #
 # ============================================
-def display_json(i, api_call, output):
+def display_json(api_call, output):
     """Format API output for better readability."""
 
     dashed = "-"*20
@@ -137,34 +138,6 @@ def display_json(i, api_call, output):
     print(header)
     print(json.dumps(output, indent=4))
     print(footer)
-
-    if i == "8": # i.e. if the user wants to get the steps data for every 15 minute interval for today
-        # convert the startGMT and end GMT to a readable format
-        for item in output:
-            # parse the start time
-            start_time = datetime.datetime.fromisoformat(item["startGMT"])
-            # convert the start time to the user's timezone
-            start_time = pytz.utc.localize(start_time).astimezone(timezone)
-            # format the start time without the GMT offset
-            item["startGMT"] = start_time.strftime('%m-%d %H:%M')
-
-            # parse the end time
-            end_time = datetime.datetime.fromisoformat(item["endGMT"])
-            # convert the end time to the user's timezone
-            end_time = pytz.utc.localize(end_time).astimezone(timezone)
-            # format the end time without the GMT offset
-            item["endGMT"] = end_time.strftime('%m-%d %H:%M')
-
-        # convert output which is a list of dictionaries to a dataframe
-        df = pd.DataFrame(output)
-        # print the last 3 rows of the dataframe:
-        print(df.tail(3))
-        # convert it to a excel file
-        df.to_excel('step_data.xlsx', index=False)
-        print("Data written to file: step_data.xlsx")
-        # convert output which is a list of dictionaries to a csv file
-
-
 
 def display_text(output):
     """Format API output for better readability."""
@@ -262,9 +235,31 @@ def switch(api, i):
 # ============================================
             elif i == "8":
                 # Get steps data for 'YYYY-MM-DD'
-                display_json(i, f"api.get_steps_data('{today.isoformat()}')", api.get_steps_data(today.isoformat()))
-                # Write data to file
-                # write_data_to_file(api.get_steps_data(today.isoformat()))
+                output = api.get_steps_data(today.isoformat())
+                for item in output:
+                    # parse the start time
+                    start_time = datetime.datetime.fromisoformat(item["startGMT"])
+                    # convert the start time to the user's timezone
+                    start_time = pytz.utc.localize(start_time).astimezone(timezone)
+                    # format the start time without the GMT offset
+                    item["startGMT"] = start_time.strftime('%m-%d %H:%M')
+
+                    # parse the end time
+                    end_time = datetime.datetime.fromisoformat(item["endGMT"])
+                    # convert the end time to the user's timezone
+                    end_time = pytz.utc.localize(end_time).astimezone(timezone)
+                    # format the end time without the GMT offset
+                    # item["endGMT"] = end_time.strftime('%m-%d %H:%M')
+                    item["endGMT"] = end_time.strftime('%H:%M')
+
+                # convert output which is a list of dictionaries to a dataframe
+                df = pd.DataFrame(output)
+                # print the last 3 rows of the dataframe:
+                print(df)
+                # convert it to a excel file and save it with the date in the file name
+                df.to_excel(f'step_data_{today.strftime("%Y-%m-%d")}.xlsx', index=False)
+                print(f"Data written to file: step_data_{today.strftime('%Y-%m-%d')}.xlsx")
+                # convert output which is a list of dictionaries to a csv file
 
 # ============================================
 #                                         #
@@ -305,7 +300,7 @@ def switch(api, i):
             elif i == "-":
                 # Get daily step data for 'YYYY-MM-DD'
                 steps = display_json(f"api.get_daily_steps('{startdate.isoformat()}, {today.isoformat()}')", api.get_daily_steps(startdate.isoformat(), today.isoformat()))
-                steps = api.get_daily_steps(startdate.isoformat(), today.isoformat())
+                # steps = api.get_daily_steps(startdate.isoformat(), today.isoformat())
                 write_data_to_file(steps)
             elif i == ".":
                 # Get training status data for 'YYYY-MM-DD'
@@ -365,7 +360,7 @@ def switch(api, i):
             elif i == "o":
                 # Get last activity
                 display_json("api.get_last_activity()", api.get_last_activity())
-            elif i == "p":    
+            elif i == "p":
                 # Get activities data from startdate 'YYYY-MM-DD' to enddate 'YYYY-MM-DD', with (optional) activitytype
                 # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
                 activities = api.get_activities_by_date(
@@ -480,7 +475,7 @@ def switch(api, i):
                 # Get past goals
                 goals = api.get_goals("past")
                 display_json("api.get_goals(\"past\")", goals)
-            
+
             # ALARMS
             elif i == "y":
                 # Get Garmin device alarms
@@ -512,7 +507,7 @@ def switch(api, i):
                 display_json(f"api.get()", api.get_activity_types())
                 for gear in gear:
                         uuid=gear["uuid"]
-                        name=gear["displayName"]                                                
+                        name=gear["displayName"]
                         display_json(f"api.get_gear_stats({uuid}) / {name}", api.get_gear_stats(uuid))
 
             elif i == "Z":
