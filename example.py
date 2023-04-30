@@ -1,4 +1,5 @@
 # TODO:
+# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezone 
 # - only show one line of the day date; thereafter only the time
 
 
@@ -31,9 +32,12 @@ import datetime
 import openpyxl
 import pytz
 import pandas as pd
+pd.set_option("display.max_rows", None)
 
 # time format
-timezone = pytz.timezone("Europe/Athens")
+# timezone = pytz.timezone("Europe/London") # tenerife
+timezone = pytz.timezone("Europe/Amsterdam") # Thuis
+# timezone = pytz.timezone("Europe/Athens") # greece
 # print the current time:
 datetime.datetime.now(timezone).strftime("%Y-%m-%d %H:%M") # the '%' is used to format the date and time, examples:
 
@@ -63,7 +67,7 @@ activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 menu_options = {
     "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
     "o": "Get last activity",
-    "8": f"Get steps data for '{today.isoformat()}'",
+    "8": f"Get steps data for today or specific date",
     None: f"----",
     "h": "Get personal record for user",
     "3": f"Get activity data for '{today.isoformat()}'",
@@ -210,8 +214,40 @@ def switch(api, i):
 #                                         #
 # ============================================
             elif i == "8":
-                # Get steps data for 'YYYY-MM-DD'
-                output = api.get_steps_data(today.isoformat())
+
+
+                today = datetime.date.today()
+
+                # use_specific_date = input("Do you want to select a specific date? (y/n) if N you can select X days ago: ")
+                # debug
+                use_specific_date = 130
+
+                # if the user entered an integer; skip to the else statement and use that as the number of days ago
+                # check if the user entered a string:
+                if not isinstance(use_specific_date, str):
+                    days_ago = int(use_specific_date)
+                    specific_date = today - datetime.timedelta(days=days_ago)
+                    print(f"You have selected {specific_date}")
+                elif use_specific_date.lower() == "y":
+                    year = 2023
+                    input_date = input("Enter the date in YY-MM-DD format: (omitting the year assumes the current year) ")
+                    if len(input_date) == 5:
+                        month, day = map(int, input_date.split("-"))
+                        specific_date = datetime.date(year, month, day)
+                    else:
+                        specific_date = datetime.date.fromisoformat(input_date)
+
+
+                # else:
+                #     days_ago = input("Enter the number of days ago (0-7): 0 is today, 1 is yesterday, etc.: ")
+                #     days_ago = int(days_ago)
+                #     specific_date = today - datetime.timedelta(days=days_ago)
+                #     print(f"You have selected {specific_date}")
+
+
+                # Get steps data for 'MM-DD'
+                output = api.get_steps_data(specific_date.isoformat())
+                # output = api.get_steps_data(datetime.date.today().isoformat())
                 for item in output:
                     # parse the start time
                     start_time = datetime.datetime.fromisoformat(item["startGMT"])
@@ -230,12 +266,21 @@ def switch(api, i):
 
                 # convert output which is a list of dictionaries to a dataframe
                 df = pd.DataFrame(output)
-                # print the last 3 rows of the dataframe:
+                # rename the "pushes" column to "cumulative steps"
+                df.rename(columns={"pushes": "cumulative steps"}, inplace=True)
+                # calculate the cumulative steps by adding eachh steps value to the previous value starting from index 1
+                df["cumulative steps"] = df["steps"].cumsum()
+
+                # print(df.tail(50))
                 print(df)
-                # convert it to a excel file and save it with the date in the file name
-                df.to_excel(f'step_data_{today.strftime("%Y-%m-%d")}.xlsx', index=False)
-                print(f"Data written to file: step_data_{today.strftime('%Y-%m-%d')}.xlsx")
-                # convert output which is a list of dictionaries to a csv file
+                # convert it to a excel file and save it with the specific date as filename:
+                df.to_excel(f"steps_{specific_date.isoformat()}.xlsx", index=False)
+                print(f"steps_{specific_date.isoformat()}.xlsx has been saved to the current directory")
+
+                print(f' the timezone location is {timezone.zone}')
+
+
+                print(f"if you want to go to the garmin connect website for this day you can click this link: \n https://connect.garmin.com/modern/daily-summary/{specific_date.isoformat()}")
 
 
             # USER STATISTIC SUMMARIES
