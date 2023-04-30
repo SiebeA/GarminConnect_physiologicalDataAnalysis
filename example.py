@@ -267,10 +267,20 @@ def switch(api, i):
                 # Get last activity
                 output = api.get_last_activity()
                 output = {k: v for k, v in output.items() if v is not None}
+                # if the value of the key is a float, round it to 1 decimal place:
+                for key, value in output.items():
+                    if "duration" in key.lower():   
+                        # convert the duration to h:mm format and replace the value of the kye with the new value
+                        output[key] = str(datetime.timedelta(seconds=value)).split('.')[0]
+                    elif type(value) == float:
+                        output[key] = round(value, 1)
+
                 display_json("api.get_last_activity()", output)
+
                 print("# only returned the dictionary keys whose value is not null, or None \n\n")
+
                 # print the following keys from the dictionary: duration; elevationGain; calories; steps:
-                print(f"Duration: {round(output['duration']/60)} minutes \n Elevation Gain: {output['elevationGain']}\nCalories: {output['calories']}\nSteps: {output['steps']:,} \n\n")
+                print(f"Duration: {output['duration']} minutes \n Elevation Gain: {output['elevationGain']}\nCalories: {output['calories']}\nSteps: {output['steps']:,} \n\n")
             
             elif i == "p":
                 # Get activities data from startdate 'YYYY-MM-DD' to enddate 'YYYY-MM-DD', with (optional) activitytype
