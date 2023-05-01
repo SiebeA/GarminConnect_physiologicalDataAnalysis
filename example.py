@@ -1,5 +1,5 @@
 # TODO:
-# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezone 
+# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezonej 
 # - only show one line of the day date; thereafter only the time
 
 
@@ -95,7 +95,7 @@ menu_options = {
 
 def write_data_to_file(data):
     """Write data to a file in the desired format"""
-    with open('step_data.txt', 'w') as f:
+    with open('Output_stepData\step_data.txt', 'w') as f:
         f.write('Date\ttotalSteps\n')
         # reverse the list so that the oldest date is first
         data.reverse()
@@ -218,9 +218,9 @@ def switch(api, i):
 
                 today = datetime.date.today()
 
-                # use_specific_date = input("Do you want to select a specific date? (y/n) if N you can select X days ago: ")
-                # debug
-                use_specific_date = 130
+                use_specific_date = input("Do you want to select a specific date? (y/n) if N you can select X days ago: ")
+            # debug:
+                # use_specific_date = 130
 
                 # if the user entered an integer; skip to the else statement and use that as the number of days ago
                 # check if the user entered a string:
@@ -236,13 +236,11 @@ def switch(api, i):
                         specific_date = datetime.date(year, month, day)
                     else:
                         specific_date = datetime.date.fromisoformat(input_date)
-
-
-                # else:
-                #     days_ago = input("Enter the number of days ago (0-7): 0 is today, 1 is yesterday, etc.: ")
-                #     days_ago = int(days_ago)
-                #     specific_date = today - datetime.timedelta(days=days_ago)
-                #     print(f"You have selected {specific_date}")
+                else:
+                    days_ago = input("Enter the number of days ago (0 is today) ")
+                    days_ago = int(days_ago)
+                    specific_date = today - datetime.timedelta(days=days_ago)
+                    print(f"You have selected {specific_date}")
 
 
                 # Get steps data for 'MM-DD'
