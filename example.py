@@ -44,6 +44,8 @@ datetime.datetime.now(timezone).strftime("%Y-%m-%d %H:%M") # the '%' is used to 
 date_str = '2023-04-27T13:30:00.0'
 date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%dT%H:%M:%S.%f')
 
+today = datetime.date.today() # datetime is a module, date is a class, today is a method
+
 
 # Configure debug logging
 # logging.basicConfig(level=logging.DEBUG)
@@ -64,8 +66,10 @@ start_badge = 1  # Badge related calls calls start counting at 1
 activitytype = ""  # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
 activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 
+
 menu_options = {
     "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
+    "info": "e.g. enter: datetime.date(2023,4,14)",
     "o": "Get last activity",
     "8": f"Get steps data for today or specific date",
     None: f"----",
@@ -88,10 +92,10 @@ menu_options = {
 #   # created by Siebe:                                      #
 # ============================================
 
-# def format_date(date_str):
-#     """Format date string in YYYY-MM-DD format"""
-#     date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
-#     return date_obj.strftime('%Y-%m-%d')
+def format_date(date_str):
+    """Format date string in YYYY-MM-DD format"""
+    date_obj = datetime.datetime.strptime(date_str, '%Y-%m-%d')
+    return date_obj.strftime('%Y-%m-%d')
 
 def write_data_to_file(data):
     """Write data to a file in the desired format"""
@@ -103,6 +107,8 @@ def write_data_to_file(data):
             date_str = format_date(item['calendarDate'])
             total_steps = item['totalSteps']
             f.write(f'{date_str}\t{total_steps}\n')
+            # also print the steps to the console
+            print(f'{total_steps}')
     print('Data written to file: step_data.txt')
 
 # :# ============================================
@@ -286,8 +292,13 @@ def switch(api, i):
                 # Get activity data for 'YYYY-MM-DD'
                 display_json(f"api.get_stats('{today.isoformat()}')", api.get_stats(today.isoformat()))
             elif i == "-":
-                # Get daily step data for 'YYYY-MM-DD'
-                steps = display_json(f"api.get_daily_steps('{startdate.isoformat()}, {today.isoformat()}')", api.get_daily_steps(startdate.isoformat(), today.isoformat()))
+                # ask the user for the number of days ago
+                today = datetime.date.today()
+                days_ago = input("Enter the number of days ago (0 is today) ")
+                days_ago = int(days_ago)
+                specific_date = today - datetime.timedelta(days=days_ago)
+                # steps = api.get_daily_steps(specific_date, today.isoformat())
+                steps = api.get_daily_steps(specific_date.isoformat(), today.isoformat())
                 # steps = api.get_daily_steps(startdate.isoformat(), today.isoformat())
                 write_data_to_file(steps)
 
