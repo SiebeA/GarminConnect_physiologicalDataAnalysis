@@ -71,7 +71,7 @@ menu_options = {
     "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
     "info": "e.g. enter: datetime.date(2023,4,14)",
     "o": "Get last activity",
-    "8": f"Get steps data for today or specific date",
+    "8": f"Get steps and floors data for today or specific date",
     None: f"----",
     "h": "Get personal record for user",
     "3": f"Get activity data for '{today.isoformat()}'",
@@ -208,6 +208,7 @@ def switch(api, i):
 
     # Skip requests if login failed
     if api:
+        today = datetime.date.today()
         try:
             print(f"\n\nExecuting: {menu_options[i]}\n")
 
@@ -224,9 +225,9 @@ def switch(api, i):
 
                 today = datetime.date.today()
 
-                use_specific_date = input("Do you want to select a specific date? (y/n) if N you can select X days ago: ")
-            # debug:
-                # use_specific_date = 130
+            # debug select 2th
+                # use_specific_date = input("Do you want to select a specific date? (y/n) if N you can select X days ago: ")
+                use_specific_date = 0
 
                 # if the user entered an integer; skip to the else statement and use that as the number of days ago
                 # check if the user entered a string:
@@ -248,9 +249,9 @@ def switch(api, i):
                     specific_date = today - datetime.timedelta(days=days_ago)
                     print(f"You have selected {specific_date}")
 
-
-                # Get steps data for 'MM-DD'
+                # Get steps and floors climbed data for 'MM-DD'
                 output = api.get_steps_data(specific_date.isoformat())
+                output_floors = api.get_floors(specific_date.isoformat())
                 # output = api.get_steps_data(datetime.date.today().isoformat())
                 for item in output:
                     # parse the start time
@@ -275,6 +276,10 @@ def switch(api, i):
                 # calculate the cumulative steps by adding eachh steps value to the previous value starting from index 1
                 df["cumulative steps"] = df["steps"].cumsum()
 
+                # add a new column to the df from : output_floors["floorValuesArray"] 2th column:
+                df["floorsAscended"] =  pd.DataFrame(output_floors["floorValuesArray"])[2]
+                df["floorsDescended"] =  pd.DataFrame(output_floors["floorValuesArray"])[3]
+                
                 # print(df.tail(50))
                 print(df)
                 # convert it to a excel file and save it with the specific date as filename:
@@ -301,8 +306,6 @@ def switch(api, i):
                 steps = api.get_daily_steps(specific_date.isoformat(), today.isoformat())
                 # steps = api.get_daily_steps(startdate.isoformat(), today.isoformat())
                 write_data_to_file(steps)
-
-
 
             elif i == "c":
                 # Get sleep data for 'YYYY-MM-DD'
