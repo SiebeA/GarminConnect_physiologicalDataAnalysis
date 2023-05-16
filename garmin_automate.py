@@ -1,7 +1,3 @@
-# TODO:
-# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezonej 
-# - only show one line of the day date; thereafter only the time
-
 
 #!/usr/bin/env python3
 """
@@ -69,23 +65,6 @@ activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 
 menu_options = {
     "8": f"Get steps and floors data for today or specific date",
-    # "-": f"Get daily step data for '{startdate.isoformat()}' to '{today.isoformat()}'",
-    # "info": "e.g. enter: datetime.date(2023,4,14)",
-    # "o": "Get last activity",
-    # None: f"----",
-    # # "h": "Get personal record for user",
-    # "3": f"Get activity data for '{today.isoformat()}'",
-    # "c": f"Get sleep data for '{today.isoformat()}'",
-    # "f": f"Get SpO2 data for '{today.isoformat()}'",
-    # "g": f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
-    # "n": f"Get activities data from start '{start}' and limit '{limit}'",
-    # "p": f"Download activities data by date from '{startdate.isoformat()}' to '{today.isoformat()}'",
-    # "r": f"Get all kinds of activities data from '{start}'",
-    # "x": f"Get Heart Rate Variability data (HRV) for '{today.isoformat()}'",
-    # "z": f"Get progress summary from '{startdate.isoformat()}' to '{today.isoformat()}' for all metrics",
-    # "A": "Get gear, the defaults, activity types and statistics",
-    # "Z": "Logout Garmin Connect portal",
-    # "q": "Exit",
 }
 
 # ============================================
