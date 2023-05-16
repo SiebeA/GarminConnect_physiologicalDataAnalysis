@@ -1,5 +1,5 @@
 # TODO:
-# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezonej 
+# - solve the timezone issue: since the data is recorded in different time zones; the df output does not start from 00:00 when the timezone does not match the local timezonej
 # - only show one line of the day date; thereafter only the time
 
 
@@ -280,7 +280,7 @@ def switch(api, i):
                 # add a new column to the df from : output_floors["floorValuesArray"] 2th column:
                 df["floorsAscended"] =  pd.DataFrame(output_floors["floorValuesArray"])[2]
                 df["floorsDescended"] =  pd.DataFrame(output_floors["floorValuesArray"])[3]
-                
+                df["floorsAscendedCumulative"] = df["floorsAscended"].cumsum()
                 # print(df.tail(50))
                 print(df)
                 # convert it to a excel file and save it with the specific date as filename:
@@ -327,7 +327,7 @@ def switch(api, i):
                 output = {k: v for k, v in output.items() if v is not None}
                 # if the value of the key is a float, round it to 1 decimal place:
                 for key, value in output.items():
-                    if "duration" in key.lower():   
+                    if "duration" in key.lower():
                         # convert the duration to h:mm format and replace the value of the kye with the new value
                         output[key] = str(datetime.timedelta(seconds=value)).split('.')[0]
                     elif type(value) == float:
@@ -339,7 +339,7 @@ def switch(api, i):
 
                 # print the following keys from the dictionary: duration; elevationGain; calories; steps:
                 print(f"Duration: {output['duration']} minutes \n Elevation Gain: {output['elevationGain']}\nCalories: {output['calories']}\nSteps: {output['steps']:,} \n\n")
-            
+
             elif i == "p":
                 # Get activities data from startdate 'YYYY-MM-DD' to enddate 'YYYY-MM-DD', with (optional) activitytype
                 # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
