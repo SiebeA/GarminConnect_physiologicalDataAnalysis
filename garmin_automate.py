@@ -1,12 +1,4 @@
 
-#!/usr/bin/env python3
-"""
-pip3 install cloudscraper requests readchar pwinput
-
-export EMAIL=<your garmin email>
-export PASSWORD=<your garmin password>
-
-"""
 import datetime
 import json
 import logging
@@ -30,6 +22,20 @@ import pytz
 import pandas as pd
 pd.set_option("display.max_rows", None)
 
+
+# from python-dotenv import load_dotenv
+from dotenv import load_dotenv
+
+import os
+
+# Load environment variables from .env file
+load_dotenv("info.env")
+
+
+# Rest of your script code here
+
+
+
 # time format
 # timezone = pytz.timezone("Europe/London") # tenerife
 # timezone = pytz.timezone("Europe/Amsterdam") # Thuis
@@ -49,6 +55,8 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Load environment variables if defined
+
+# Read the email and password from environment variables
 email = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
 api = None
@@ -62,10 +70,6 @@ start_badge = 1  # Badge related calls calls start counting at 1
 activitytype = ""  # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
 activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
 
-
-menu_options = {
-    "8": f"Get steps and floors data for today or specific date",
-}
 
 # ============================================
 #   # created by Siebe:                                      #
@@ -149,20 +153,8 @@ def init_api(email, password):
     return api
 
 
-def print_menu():
-    """Print examples menu."""
-    for key in menu_options.keys():
-        print(f"{key} -- {menu_options[key]}")
-    print("Make your selection: ", end="", flush=True)
-
-
-def switch(api, i):
+def switch(api, i, timeframe):
     """Run selected API call."""
-
-    # Exit example program
-    if i == "q":
-        print("Bye!")
-        sys.exit()
 
     # Skip requests if login failed
     if api:
@@ -170,16 +162,22 @@ def switch(api, i):
 
         
         try:
-            print(f"\n\nExecuting: {menu_options[i]}\n")
 # ============================================
 #                                         #
 # ============================================
             if i == "8":
+
                 today = datetime.date.today()
-                # always today as default because we want to automate this and download the data every day for today
-                # Get steps and floors climbed data for 'MM-DD'
-                output = api.get_steps_data(today.isoformat())
-                output_floors = api.get_floors(today.isoformat())
+                yesterday = today - datetime.timedelta(days=1)
+                if timeframe == "y" or timeframe == "yesterday".lower():
+                    timeframe = yesterday
+                else:
+                    timeframe = today
+                # timeframe = today
+                # timeframe = yesterday
+                # timeframe = yesterday
+                output = api.get_steps_data(timeframe.isoformat()) # Get steps and floors climbed data for 'MM-DD'
+                output_floors = api.get_floors(timeframe.isoformat())
                 # output = api.get_steps_data(datetime.date.today().isoformat())
                 for item in output:
                     # parse the start time
@@ -215,11 +213,11 @@ def switch(api, i):
                 # convert it to a excel file and save it with the specific date as filename:
 
                 # save it tot he Output_stepData folder:
-                df.to_excel(f"Output_stepData/steps_{specific_date.isoformat()}.xlsx", index=False)
+                df.to_excel(f"Output_stepData/steps_{timeframe.isoformat()}.xlsx", index=False)
 
-                print(f"\n steps_{specific_date.isoformat()}.xlsx has been saved to the current directory\n")
+                print(f"\n steps_{timeframe.isoformat()}.xlsx has been saved to the current directory\n")
                 print(f'\n the timezone location is {timezone.zone}\n')
-                print(f"if you want to go to the garmin connect website for this day you can click this link: \n https://connect.garmin.com/modern/daily-summary/{specific_date.isoformat()} \n\n")
+                print(f"if you want to go to the garmin connect website for this day you can click this link: \n https://connect.garmin.com/modern/daily-summary/{today.isoformat()} \n\n")
 
 
  
@@ -241,15 +239,12 @@ def switch(api, i):
     else:
         print("Could not login to Garmin Connect, try again later.")
 
-# Main program loop
-while True:
-    # Display header and login
+if __name__ == "__main__":
+    api = init_api(email, password)
+    timeframe = input("yesterday (y) or today? \n")
 
-    # Init API
-    if not api: # if api is not defined yet because it is the first time the program is run
-        api = init_api(email, password)
+    switch(api, "8", timeframe)
 
-    # Display menu
-    print_menu()
-    i = readchar.readkey()
-    switch(api, i)
+# TODO:
+# - download yesterday data to insure that the data is complete and synced
+# - check delta with last sync timestamp
