@@ -139,7 +139,8 @@ def switch(api, i, timeframe):
                     df["floorsAscendedCumulative"] = df["floorsAscended"].cumsum()
 
                     # Convert it to an Excel file and save it with the specific date as filename
-                    filename = f"steps_{timeframe.isoformat()}.xlsx"
+                    location = str(timezone).split("/")[1]
+                    filename = f"steps_{timeframe.isoformat()}_{location}.xlsx"
                     filepath = os.path.join("Output_stepData", filename)
                     df.to_excel(filepath, index=False)
 
