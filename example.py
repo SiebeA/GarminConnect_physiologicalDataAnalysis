@@ -59,9 +59,10 @@ api = None
 
 # Example selections and settings
 today = datetime.date.today()
+yesterday = datetime.date.today() - datetime.timedelta(days=1)
 startdate = today - datetime.timedelta(days=10) # Select past week
 start = 0
-limit = 100
+limit = 1
 start_badge = 1  # Badge related calls calls start counting at 1
 activitytype = ""  # Possible values are: cycling, running, swimming, multi_sport, fitness_equipment, hiking, walking, other
 activityfile = "MY_ACTIVITY.fit" # Supported file types are: .fit .gpx .tcx
@@ -74,7 +75,7 @@ menu_options = {
     "8": f"Get steps and floors data for today or specific date",
     None: f"----",
     "h": "Get personal record for user",
-    "3": f"Get activity data for '{today.isoformat()}'",
+    "3": f"Get activity data for '{yesterday.isoformat()}'",
     "c": f"Get sleep data for '{today.isoformat()}'",
     "f": f"Get SpO2 data for '{today.isoformat()}'",
     "g": f"Get max metric data (like vo2MaxValue and fitnessAge) for '{today.isoformat()}'",
@@ -296,7 +297,7 @@ def switch(api, i):
             # USER STATISTIC SUMMARIES
             elif i == "3":
                 # Get activity data for 'YYYY-MM-DD'
-                display_json(f"api.get_stats('{today.isoformat()}')", api.get_stats(today.isoformat()))
+                display_json(f"api.get_stats('{yesterday.isoformat()}')", api.get_stats(yesterday.isoformat()))
             elif i == "-":
                 # ask the user for the number of days ago
                 today = datetime.date.today()
@@ -464,3 +465,7 @@ while True:
     print_menu()
     option = readchar.readkey()
     switch(api, option)
+
+
+# TODO
+# - convert seconds to hours and minute format

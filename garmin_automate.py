@@ -31,7 +31,7 @@ email = os.getenv("EMAIL")
 password = os.getenv("PASSWORD")
 api = None
 
-timezone = pytz.timezone("Europe/Amsterdam") # greece
+timezone = pytz.timezone("Europe/amsterdam")
 # print the current time:
 datetime.datetime.now(timezone).strftime("%Y-%m-%d %H:%M") # the '%' is used to format the date and time, examples:
 
@@ -91,7 +91,6 @@ def switch(api, i, timeframe):
     # Skip requests if login failed
     if api:
         today = datetime.date.today()
-
         try:
             if i == "8":
                 if timeframe == "y" or timeframe == "yesterday".lower():
@@ -99,7 +98,10 @@ def switch(api, i, timeframe):
                 elif timeframe == "lxd".lower():
                     num_days = int(input("Enter the number of days: "))
                     timeframe = today - datetime.timedelta(days=num_days)
-                else:
+                    # let the user know what wil be the last date that will be pulled
+                    print()
+
+                elif timeframe == "t" or timeframe == "today":
                     timeframe = today
 
                 # Loop through each day in the timeframe
@@ -171,5 +173,7 @@ if __name__ == "__main__":
 
 
 # TODO:
+# - .
+# - last cumulative step into the file name
 # - download yesterday data to insure that the data is complete and synced
 # - check delta with last sync timestamp
